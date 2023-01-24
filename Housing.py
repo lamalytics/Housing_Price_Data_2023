@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error as MSE
+from sklearn.model_selection import GridSearchCV
 
 train_set = pd.read_csv(
     "house-prices-advanced-regression-techniques-data/train.csv")
@@ -57,22 +58,25 @@ final_features = np.concatenate((features[numerical_cols].values, train_set_enco
 # partitition training set since test_set has no sales price for prediction
 train_features, test_features, train_target, test_target = train_test_split(final_features,target, test_size=0.2, random_state=21)
 
-# print(train_target)
-
-# select only categorical columns
-# categorical_cols = features.select_dtypes(include=["object"]).columns
-# test_cat_cols = test_features.select_dtypes(include=["object"]).columns
-# encoding cat variables as dummies on pre_train set
-# train_set_encoded = pd.get_dummies(features, columns=categorical_cols)
-# test_set_encoded = pd.get_dummies(test_features, columns=test_cat_cols)
-# features_final = train_set_encoded.values
 
 # next step hypertuning
 xgb_model = xgb.XGBRegressor()
-xgb_model.fit(train_features, train_target)
-predict_target = xgb_model.predict(test_features)
+param_grid = {
+    'max_depth': [3, 4, 5],
+    'learning_rate': [0.1, 0.01, 0.001],
+    'n_estimators': [50, 100, 200],
+}
+grid_search = GridSearchCV(xgb_model, param_grid, cv=5)
 
-rmse = MSE(test_target, predict_target) ** (1/2)
-print(rmse)
-# RMSE at 33K :(
+
+grid_search.fit(train_features, train_target)
+print("Best parameters: ", grid_search.best_params_)
+print("Best score: ", grid_search.best_score_)
+
+best_model = grid_search.best_estimator_
+
+predict_target = best_model.predict(test_features)
+test_df = pd.DataFrame(test_features, predict_target)
+print(test_df)
+
 
