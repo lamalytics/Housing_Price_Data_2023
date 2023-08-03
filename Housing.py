@@ -23,13 +23,13 @@ test_set = pd.read_csv(
 # print(train_set.describe())
 # print(test_set.describe())
 
-sns.histplot(data=train_set, x="SalePrice", color="orange")
-sns.displot(data=train_set, x="MSZoning", color="blue")
+# sns.histplot(data=train_set, x="SalePrice", color="orange")
+# sns.displot(data=train_set, x="MSZoning", color="blue")
 
 
-corr_matrix = train_set.corr(method='spearman', numeric_only=True)
-sns.heatmap(corr_matrix, cmap='coolwarm')
-plt.show()
+# corr_matrix = train_set.corr(method='spearman', numeric_only=True)
+# sns.heatmap(corr_matrix, cmap='coolwarm')
+# plt.show()
 
 # print(train_set.isnull().sum().sort_values(ascending=False))
 # print(test_set.isnull().sum().sort_values(ascending=False))
@@ -77,6 +77,6 @@ best_model = grid_search.best_estimator_
 
 predict_target = best_model.predict(test_features)
 test_df = pd.DataFrame(test_features, predict_target)
-print(test_df)
+print(test_df.index)
 
 
